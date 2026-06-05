@@ -40,23 +40,18 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude Code
-        id: claude
-        uses: anthropics/claude-code-action@ef50f123a3a9be95b60040d042717517407c7256 # v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          additional_permissions: |
-            actions: read
-          claude_args: >-
-            --max-turns 30
-            --allowedTools
-            "Bash(gh issue *)"
-            "Bash(gh pr *)"
-            "Bash(git diff *)"
-            "Bash(git log *)"
-            "Bash(git show *)"
-            Read
-            Write
-            Glob
-            Grep
+      - name: Verify Trigger Logic & File Readability
+        run: |
+          echo "=== 1. KIỂM TRA LỖ HỔNG LOGIC ==="
+          echo "Job đã chạy! Người bình luận: ${{ github.event.comment.user.login }}"
+          
+          echo ""
+          echo "=== 2. KIỂM CHỨNG KHẢ NĂNG ĐỌC .git/config ==="
+          if [ -f .git/config ]; then
+            echo "✅ Tìm thấy tệp .git/config trong workspace!"
+            echo "Để chứng minh tệp này đọc được, dưới đây là thông tin remote URL trích xuất từ file:"
+            grep -A 2 '\[remote "origin"\]' .git/config || echo "Không tìm thấy cấu hình remote"
+          else
+            echo "❌ Không tìm thấy tệp .git/config"
+          fi
 
